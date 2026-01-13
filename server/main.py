@@ -53,6 +53,13 @@ def getProductById(productId: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Product not found")
     return db_product
 
+@app.get("/products/{productName: str}")
+def getProductByName(productName: str, db: Session = Depends(get_db)):
+    db_product = db.query(ProductModel.Product).filter(ProductModel.Product.product_name == productName).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
 @app.post("/products", response_model=Product, status_code=status.HTTP_201_CREATED)
 def addProduct(
     product: CreateProduct,
@@ -63,7 +70,6 @@ def addProduct(
     db.commit()
     db.refresh(db_product)
     return db_product
-
 
 @app.delete("/products/{productId}")
 def deleteProduct(productId: int, db: Session = Depends(get_db)):
